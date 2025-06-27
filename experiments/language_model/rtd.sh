@@ -3,7 +3,7 @@ SCRIPT=$(readlink -f "$0")
 SCRIPT_DIR=$(dirname "$SCRIPT")
 cd $SCRIPT_DIR
 
-cache_dir=/tmp/DeBERTa/RTD/
+cache_dir=/home/ec2-user/deberta_pretraining/experiments/language_model  #/tmp/DeBERTa/RTD/
 
 max_seq_length=512
 data_dir=$cache_dir/wiki103/spm_$max_seq_length
@@ -16,12 +16,12 @@ function setup_wiki_data(){
 	fi
 
 	if [[ ! -e  $data_dir/test.txt ]]; then
-		wget -q https://s3.amazonaws.com/research.metamind.io/wikitext/wikitext-103-v1.zip -O $cache_dir/wiki103.zip
-		unzip -j $cache_dir/wiki103.zip -d $cache_dir/wiki103
+		#wget -q https://s3.amazonaws.com/research.metamind.io/wikitext/wikitext-103-v1.zip -O $cache_dir/wiki103.zip
+		#unzip -j $cache_dir/wiki103.zip -d $cache_dir/wiki103
 		mkdir -p $data_dir
-		python ./prepare_data.py -i $cache_dir/wiki103/wiki.train.tokens -o $data_dir/train.txt --max_seq_length $max_seq_length
-		python ./prepare_data.py -i $cache_dir/wiki103/wiki.valid.tokens -o $data_dir/valid.txt --max_seq_length $max_seq_length
-		python ./prepare_data.py -i $cache_dir/wiki103/wiki.test.tokens -o $data_dir/test.txt --max_seq_length $max_seq_length
+		python3 ./prepare_data.py -i $cache_dir/wikitext-103/wiki.train.tokens -o $data_dir/train.txt --max_seq_length $max_seq_length
+		python3 ./prepare_data.py -i $cache_dir/wikitext-103/wiki.valid.tokens -o $data_dir/valid.txt --max_seq_length $max_seq_length
+		python3 ./prepare_data.py -i $cache_dir/wikitext-103/wiki.test.tokens -o $data_dir/test.txt --max_seq_length $max_seq_length
 	fi
 }
 
@@ -51,7 +51,9 @@ case ${init,,} in
 	--model_config rtd_xsmall.json \
 	--warmup 10000 \
 	--learning_rate 3e-4 \
-	--train_batch_size 64 \
+	--train_batch_size 4 \
+	--eval_batch_size 4 \
+        --predict_batch_size 4 \
 	--decoupled_training True \
 	--fp16 True "
 		;;
@@ -97,7 +99,7 @@ case ${init,,} in
 		;;
 esac
 
-python -m DeBERTa.apps.run --model_config config.json  \
+python3 -m DeBERTa.apps.run --model_config config.json  \
 	--tag $tag \
 	--do_train \
 	--num_training_steps 1000000 \

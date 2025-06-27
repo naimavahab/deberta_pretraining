@@ -7,6 +7,11 @@ from tqdm import tqdm
 def tokenize_data(input, output=None, max_seq_length=512):
   p,t=deberta.load_vocab(vocab_path=None, vocab_type='spm', pretrained_id='deberta-v3-base')
   tokenizer=deberta.tokenizers[t](p)
+
+
+#  for token, idx in tokenizer.get_vocab().items():
+ #   print(f"{idx}: {token}")
+
   if output is None:
     output=input + '.spm'
   all_tokens = []

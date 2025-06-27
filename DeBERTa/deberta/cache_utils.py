@@ -116,6 +116,7 @@ def load_vocab(vocab_path=None, vocab_type=None, pretrained_id=None, tag=None, n
     pretrained = pretrained_models[pretrained_id.lower()]
     if not cache_dir:
       cache_dir = os.path.join(pathlib.Path.home(), f'.~DeBERTa/assets/{_tag}/{pretrained.name}')
+      print(cache_dir)
     os.makedirs(cache_dir, exist_ok=True)
     vocab_type = pretrained.vocab_type
     url = pretrained.vocab_url
@@ -125,7 +126,13 @@ def load_vocab(vocab_path=None, vocab_type=None, pretrained_id=None, tag=None, n
       asset = download_asset(url, outname, tag=tag, no_cache=no_cache, cache_dir=cache_dir)
   if vocab_type is None:
     vocab_type = 'spm'
+  vocab_path = '/home/ec2-user/deberta_pretraining/DeBERTa/apps/tasks/rna_char.model'
+  vocab_type='spm'
   return vocab_path, vocab_type
 
 def test_download():
-  vocab = load_vocab()
+  #vocab = load_vocab()
+  #naima
+  vocab = load_vocab(vocab_path=None, vocab_type='spm', pretrained_id='deberta-v3-base')
+
+test_download()

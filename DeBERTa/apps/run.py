@@ -283,7 +283,7 @@ def main(args):
   tokenizer = tokenizers[vocab_type](vocab_path)
   task = get_task(args.task_name)(tokenizer = tokenizer, args=args, max_seq_len = args.max_seq_length, data_dir = args.data_dir)
   label_list = task.get_labels()
-
+  print('label_list',label_list)
   eval_data = task.eval_data(max_seq_len=args.max_seq_length)
   logger.info("  Evaluation batch size = %d", args.eval_batch_size)
   if args.do_predict:
@@ -294,6 +294,13 @@ def main(args):
     train_data = task.train_data(max_seq_len=args.max_seq_length, debug=args.debug)
   model_class_fn = task.get_model_class_fn()
   model = create_model(args, len(label_list), model_class_fn)
+#  model.resize_token_embeddings(len(tokenizer))
+  print(model)
+#  model.deberta.resize_token_embeddings(len(tokenizer))
+
+#  model.token_rep_layer.bert_layer.model.resize_token_embeddings(len(tokenizer))
+
+
   if args.do_train:
     with open(os.path.join(args.output_dir, 'model_config.json'), 'w', encoding='utf-8') as fs:
       fs.write(model.config.to_json_string() + '\n')
@@ -312,6 +319,8 @@ def main(args):
     run_eval(args, model, device, eval_data, prefix=args.tag)
 
   if args.do_train:
+ #   model.resize_token_embeddings(len(tokenizer))
+
     train_fn = task.get_train_fn(args, model)
     train_model(args, model, device, train_data, eval_data, run_eval_fn, loss_fn=loss_fn, train_fn = train_fn)
 
