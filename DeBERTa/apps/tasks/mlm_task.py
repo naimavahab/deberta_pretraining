@@ -128,7 +128,9 @@ class MLMTask(Task):
 
   def train_data(self, max_seq_len=512, **kwargs):
     data = self.load_data(os.path.join(self.data_dir, 'train.txt'))
+ #   print(data[0],'data_0')
     examples = ExampleSet(data)
+  #  print(examples[0], 'examples')
     if self.args.num_training_steps is None:
       dataset_size = len(examples)
     else:
@@ -283,12 +285,25 @@ dataset_size = dataset_size, shuffle=True, **kwargs)
     parser.add_argument('--max_ngram', type=int, default=1, help='Maxium ngram sampling span')
     parser.add_argument('--num_training_steps', type=int, default=None, help='Maxium pre-training steps')
 
+import argparse
+
 def test_MLM():
   from ...deberta import tokenizers,load_vocab
   import pdb
   vocab_path, vocab_type = load_vocab(vocab_path = None, vocab_type = 'spm', pretrained_id = 'xlarge-v2')
   tokenizer = tokenizers[vocab_type](vocab_path)
   mask_gen = NGramMaskGenerator(tokenizer, max_gram=1)
-  mlm = MLMTask('/mnt/penhe/data/wiki103/spm', tokenizer, None)
+  args = argparse.Namespace()
+  args.max_ngram = 1  # default value
+  args.num_training_steps = None
+  args.train_batch_size = 4
+  args.rank = 0
+  args.eval_batch_size = 4
+  args.workers = 4
+  args.world_size = 1
+  mlm = MLMTask('/home/ec2-user/deberta_pretraining/experiments/language_model/wiki103/spm_512', tokenizer, args)
   train_data = mlm.train_data(mask_gen = mask_gen)
-  pdb.set_trace()
+ # print(train_data[0])
+  #pdb.set_trace()
+
+test_MLM()

@@ -7,7 +7,7 @@
 # Date: 11/15/2020
 #
 
-
+from transformers import AutoTokenizer
 import sentencepiece as sp
 import six
 import unicodedata
@@ -40,7 +40,7 @@ class SPMTokenizer:
     #self.vocab['[SEP]'] = 2
     #self.vocab['[UNK]'] = 3
 
-    _special_tokens = ['[MASK]', '[SEP]', '[PAD]', '[UNK]', '[CLS]']
+    _special_tokens = [] #['[MASK]', '[SEP]', '[PAD]', '[UNK]', '[CLS]']
     self.special_tokens = []
     if special_tokens is not None:
       _special_tokens.extend(special_tokens)
@@ -51,6 +51,18 @@ class SPMTokenizer:
     self.pat = re.compile(r"""'s|'t|'re|'ve|'m|'ll|'d| ?\p{L}+| ?\p{N}+| ?[^\s\p{L}\p{N}]+|\s+(?!\S)|\s+""")
 
   def tokenize(self, text):
+    '''
+    tokenizer = AutoTokenizer.from_pretrained("/home/ec2-user/deberta_pretraining/DeBERTa/apps/tasks/deberta_rna_tokeniser", use_fast=False, local_files_only=True)
+    encoded = tokenizer(
+        text,
+        return_tensors="pt",         # Return PyTorch tensors
+        padding="max_length",        # Pad to model's max length
+        truncation=True,             # Truncate if too long
+        max_length=64 #512               # You can adjust as needed
+    )
+    
+    return encoded
+    '''    
     pieces = self._encode_as_pieces(text)
     def _norm(x):
       if x not in self.vocab or x=='<unk>':
@@ -59,7 +71,7 @@ class SPMTokenizer:
         return x
     pieces = [_norm(p) for p in pieces]
     return pieces
-
+    
   def convert_tokens_to_ids(self, tokens):
     return [self.vocab[t] if t in self.vocab else 1 for t in tokens]
 
